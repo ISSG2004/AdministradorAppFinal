@@ -54,4 +54,14 @@ export class FormularioCreacionCitaComponent {
       //añadimos los campos que vamos a añadir en este formulario
     });
   }
+  procesarFormularios(){
+    //si el primer formulario es valido, se procesa el segundo formulario
+    if(this.primerFormulario.valid){
+      console.log("Formulario 1: ", this.primerFormulario.value);
+      //aqui se procesaria el segundo formulario
+      console.log("Formulario 2: ", this.segundoFormulario.value);
+    }else{
+      console.log("El primer formulario no es valido");
+    }
+  }
 }
