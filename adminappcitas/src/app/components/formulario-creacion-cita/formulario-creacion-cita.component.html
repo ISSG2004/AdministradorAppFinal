@@ -1,1 +1,23 @@
+<mat-stepper orientation="vertical" [linear]="isLinear" #steeper>
+  <mat-step [stepControl]="primerFormulario" >
+    <form [formGroup]="primerFormulario">
+        <ng-template matStepLabel>Días a crear citas</ng-template>
+        <mat-form-field>
+          <mat-label>Introduce el rango de fechas</mat-label>
+          <mat-date-range-input [formGroup]="primerFormulario" [rangePicker]="picker">
+            <mat-date-range-picker></mat-date-range-picker>
+            <input matStartDate placeholder="Fecha de inicio" formControlName="fechaInicio">
+            <input matEndDate placeholder="Fecha de fin" formControlName="fechaFin">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="segundoFormulario" >
+    <form [formGroup]="segundoFormulario">
+        <ng-template matStepLabel>Tramos horarios de las citas</ng-template>
 
+    </form>
+  </mat-step>
+</mat-stepper>
