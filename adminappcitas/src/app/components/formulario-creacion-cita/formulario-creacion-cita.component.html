@@ -1,9 +1,11 @@
 <mat-stepper orientation="vertical" [linear]="isLinear" #steeper>
+  <!--Paso 1-->
   <mat-step [stepControl]="primerFormulario" >
     <form [formGroup]="primerFormulario">
         <ng-template matStepLabel>Días a crear citas</ng-template>
+        <!--Selección de días-->
         <mat-form-field>
-          <mat-label>Introduce el rango de fechas</mat-label>
+          <mat-label>Rango de fechas...</mat-label>
           <mat-date-range-input [formGroup]="primerFormulario" [rangePicker]="picker">
             <mat-date-range-picker></mat-date-range-picker>
             <input matStartDate placeholder="Fecha de inicio" formControlName="fechaInicio">
@@ -12,12 +14,31 @@
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
+        <!--Selección de días libres del negocio-->
+        <mat-form-field appearance="fill">
+          <mat-label>Días libres</mat-label>
+          <mat-select formControlName="diasLibres" multiple>
+            <mat-option *ngFor="let dia of diasSemanaLista" [value]="dia">
+              {{ dia }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!--Selección de días libres (introducidos por número por excepción)-->
     </form>
   </mat-step>
+  <!--Selección de horarios-->
   <mat-step [stepControl]="segundoFormulario" >
     <form [formGroup]="segundoFormulario">
         <ng-template matStepLabel>Tramos horarios de las citas</ng-template>
 
     </form>
+  </mat-step>
+  <!--Revisión de citas-->
+  <mat-step >
+    <ng-template matStepLabel>Revisión de citas</ng-template>
+  </mat-step>
+  <!--Crear citas-->
+  <mat-step >
+    <ng-template matStepLabel>Crear citas</ng-template>
   </mat-step>
 </mat-stepper>
