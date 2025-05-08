@@ -9,6 +9,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatOption } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
+import { PrevisualizarCitasCreadasComponent } from '../previsualizar-citas-creadas/previsualizar-citas-creadas.component';
+import {MatRadioModule} from '@angular/material/radio';
 @Component({
   selector: 'app-formulario-creacion-cita',
   imports: [
@@ -22,7 +24,9 @@ import { CommonModule } from '@angular/common';
     MatNativeDateModule,
     MatSelectModule,
     MatOption,
-    CommonModule
+    CommonModule,
+    PrevisualizarCitasCreadasComponent,
+    MatRadioModule
   ],
   templateUrl: './formulario-creacion-cita.component.html',
   styleUrl: './formulario-creacion-cita.component.css'
@@ -47,11 +51,12 @@ export class FormularioCreacionCitaComponent {
       //añadimos los campos que vamos a añadir en este formulario
       fechaInicio: ['' , Validators.required],
       fechaFin: ['', Validators.required],
-      diasLibres: ['', Validators.required],
+      diasLibres: [''],
     });
     //Inicializamos el formulario reactivo pt2
     this.segundoFormulario = this.formBuilder.group({
       //añadimos los campos que vamos a añadir en este formulario
+      tipoJornada: ['',Validators.required],
     });
   }
   procesarFormularios(){

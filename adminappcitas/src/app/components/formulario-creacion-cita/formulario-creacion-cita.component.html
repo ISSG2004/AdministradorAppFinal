@@ -30,15 +30,25 @@
   <mat-step [stepControl]="segundoFormulario" >
     <form [formGroup]="segundoFormulario">
         <ng-template matStepLabel>Tramos horarios de las citas</ng-template>
+        <!--Selección de horarios en los que se va a abrir-->
+        <mat-radio-group formControlName="tipoJornada" aria-label="Tipo de jornada">
+          <mat-radio-button value="jornadaPartida" >Jornada partida</mat-radio-button>
+          <mat-radio-button value="jornadaContinua">Jornada continua</mat-radio-button>
+        </mat-radio-group>
+        <ng-container *ngIf="segundoFormulario.get('tipoJornada')?.value === 'jornadaPartida'">
+          
+        </ng-container>
+        <ng-container *ngIf="segundoFormulario.get('tipoJornada')?.value === 'jornadaContinua'">
 
+        </ng-container>
     </form>
   </mat-step>
   <!--Revisión de citas-->
   <mat-step >
     <ng-template matStepLabel>Revisión de citas</ng-template>
+    <app-previsualizar-citas-creadas></app-previsualizar-citas-creadas>
   </mat-step>
   <!--Crear citas-->
-
   <mat-step >
     <ng-template matStepLabel>Crear citas</ng-template>
     <button mat-stroked-button (click)="procesarFormularios()">Crear citas</button>
