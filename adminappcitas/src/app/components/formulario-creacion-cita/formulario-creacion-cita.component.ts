@@ -14,6 +14,17 @@ import {MatRadioModule} from '@angular/material/radio';
 import {MatTimepickerModule} from '@angular/material/timepicker';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { Dialog } from '@angular/cdk/dialog';
+import { DialogErrorValdiacionComponent } from '../dialogs/dialog-error-valdiacion/dialog-error-valdiacion.component';
 @Component({
   selector: 'app-formulario-creacion-cita',
   providers: [provideNativeDateAdapter()],
@@ -32,7 +43,8 @@ import { MatDividerModule } from '@angular/material/divider';
     PrevisualizarCitasCreadasComponent,
     MatRadioModule,
     MatTimepickerModule,
-    MatDividerModule
+    MatDividerModule,
+    DialogErrorValdiacionComponent
   ],
   templateUrl: './formulario-creacion-cita.component.html',
   styleUrl: './formulario-creacion-cita.component.css'
@@ -55,7 +67,7 @@ export class FormularioCreacionCitaComponent {
   //formulario para las horas de apertura y cierre jornada completa
   formularioHorasJornadaCompleta!: FormGroup;
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder,private dialogo:MatDialog) {}
   //creando el objeto cita
   //ponemos un calendario en el que seleccionamos fecha de inicio y fecha de fin del rango en el que vamos a crear las citas
   //ponemos un item para seleccionar los horarios de apertura del negocio (ver como hacer para seleccionar el horario en jornada partida)
@@ -64,9 +76,9 @@ export class FormularioCreacionCitaComponent {
     //Inicializamos el formulario reactivo pt1
     this.primerFormulario = this.formBuilder.group({
       //añadimos los campos que vamos a añadir en este formulario
-      fechaInicio: ['' , Validators.required],
+      fechaInicio: ['' , [Validators.required, this.validarFechaInicio()]],
       fechaFin: ['', Validators.required],
-      diasLibres: [''],
+      diasLibres: ['',],
     });
     //Inicializamos el formulario reactivo pt2 y en función del tipo de jornada que seleccionemos, se valida un formulario u otro
     // Inicialización del FormGroup
@@ -117,12 +129,10 @@ export class FormularioCreacionCitaComponent {
   }
   procesarFormularios(){
     //si el primer formulario es valido, se procesa el segundo formulario
-    if(this.primerFormulario.valid){
-      console.log("Formulario 1: ", this.primerFormulario.value);
-      //aqui se procesaria el segundo formulario
-      console.log("Formulario 2: ", this.segundoFormulario.value);
+    if(this.primerFormulario.valid && this.segundoFormulario.valid){
+      alert("Formulario enviado correctamente")
     }else{
-      console.log("El primer formulario no es valido");
+      this.dialogo.open(DialogErrorValdiacionComponent)
     }
   }
   conversionDuracionCita(duracion: any): number {
@@ -147,35 +157,91 @@ export class FormularioCreacionCitaComponent {
   }
   horaAperturaAntesQueCierreJornadaCompletaValidator(): ValidatorFn {
     return (group: AbstractControl): ValidationErrors | null => {
-      const apertura: Date = group.get('apertura')?.value;
-      const cierre: Date = group.get('cierre')?.value;
-      if (!apertura || !cierre) return null; // Si algún valor no está presente, no validar aún
-      // Validar que apertura sea anterior a cierre
-      return apertura >= cierre ? { horaInvalida: true } : null;
-    };
-  }
-  horaAperturaAntesQueCierreJornadaPartidaValidator(): ValidatorFn {
-    return (group: AbstractControl): ValidationErrors | null => {
-      const aperturaManana: Date = group.get('aperturaManana')?.value;
-      const cierreManana: Date = group.get('cierreManana')?.value;
-      const aperturaTarde: Date = group.get('aperturaTarde')?.value;
-      const cierreTarde: Date = group.get('cierreTarde')?.value;
-      if (!aperturaManana || !cierreManana || !aperturaTarde || !cierreTarde) return null;
-      // Validar que apertura de la mañana sea antes que el cierre de la mañana
-      if (aperturaManana >= cierreManana) {
-        return { horarioMananaInvalido: true };
+      const aperturaCtrl = group.get('apertura');
+      const cierreCtrl = group.get('cierre');
+
+      const apertura: Date = new Date(aperturaCtrl?.value);
+      const cierre: Date = new Date(cierreCtrl?.value);
+
+      if (!aperturaCtrl || !cierreCtrl || !apertura || !cierre) return null;
+
+      // Resetear errores previos
+      aperturaCtrl.setErrors(null);
+      cierreCtrl.setErrors(null);
+
+      if (apertura >= cierre) {
+        aperturaCtrl.setErrors({ horaInvalida: true });
+        cierreCtrl.setErrors({ horaInvalida: true });
+        return { horaInvalida: true };
       }
-      // Validar que apertura de la tarde sea antes que el cierre de la tarde
-      if (aperturaTarde >= cierreTarde) {
-        return { horarioTardeInvalido: true };
-      }
-      // Validar que cierre de la mañana sea antes que la apertura de la tarde
-      if (cierreManana >= aperturaTarde) {
-        return { intervaloInvalido: true };
-      }
+
       return null;
     };
   }
 
+  horaAperturaAntesQueCierreJornadaPartidaValidator(): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const aperturaMananaCtrl = group.get('aperturaManana');
+      const cierreMananaCtrl = group.get('cierreManana');
+      const aperturaTardeCtrl = group.get('aperturaTarde');
+      const cierreTardeCtrl = group.get('cierreTarde');
+
+      const aperturaManana: Date = new Date(aperturaMananaCtrl?.value);
+      const cierreManana: Date = new Date(cierreMananaCtrl?.value);
+      const aperturaTarde: Date = new Date(aperturaTardeCtrl?.value);
+      const cierreTarde: Date = new Date(cierreTardeCtrl?.value);
+
+      if (!aperturaManana || !cierreManana || !aperturaTarde || !cierreTarde) return null;
+
+      // Resetear errores previos
+      aperturaMananaCtrl?.setErrors(null);
+      cierreMananaCtrl?.setErrors(null);
+      aperturaTardeCtrl?.setErrors(null);
+      cierreTardeCtrl?.setErrors(null);
+
+      let hasError = false;
+
+      if (aperturaManana >= cierreManana) {
+        aperturaMananaCtrl?.setErrors({ horarioMananaInvalido: true });
+        cierreMananaCtrl?.setErrors({ horarioMananaInvalido: true });
+        hasError = true;
+      }
+
+      if (aperturaTarde >= cierreTarde) {
+        aperturaTardeCtrl?.setErrors({ horarioTardeInvalido: true });
+        cierreTardeCtrl?.setErrors({ horarioTardeInvalido: true });
+        hasError = true;
+      }
+
+      if (cierreManana >= aperturaTarde) {
+        cierreMananaCtrl?.setErrors({ intervaloInvalido: true });
+        aperturaTardeCtrl?.setErrors({ intervaloInvalido: true });
+        hasError = true;
+      }
+
+      return hasError ? { horarioInvalido: true } : null;
+    };
+  }
+
+  validarFechaInicio(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const rawValue = control.value;
+      if (!rawValue) return null;
+
+      const fechaInicio = new Date(rawValue);
+      if (isNaN(fechaInicio.getTime())) return { fechaInvalida: true }; // Por si no es una fecha válida
+
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      fechaInicio.setHours(0, 0, 0, 0);
+
+      if (fechaInicio < hoy) {
+        return { fechaInvalida: true };
+      }
+
+      return null;
+    };
+  }
 
 }
+
