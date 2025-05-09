@@ -36,10 +36,77 @@
           <mat-radio-button value="jornadaContinua">Jornada continua</mat-radio-button>
         </mat-radio-group>
         <ng-container *ngIf="segundoFormulario.get('tipoJornada')?.value === 'jornadaPartida'">
-          
-        </ng-container>
-        <ng-container *ngIf="segundoFormulario.get('tipoJornada')?.value === 'jornadaContinua'">
+          <br>
+          <!--Selección de horarios en los que se va a abrir cuando es jornada partida-->
+          <div formGroupName="formularioHorasJornadaPartida">
+            <mat-form-field>
+              <mat-label>Hora de apertura Mañana</mat-label>
+              <input matInput [matTimepicker]="pickerInicioManana" formControlName="aperturaManana">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerInicioManana"/>
+              <mat-timepicker #pickerInicioManana/>
+            </mat-form-field>
 
+            <mat-form-field>
+              <mat-label>Hora de cierre Mañana</mat-label>
+              <input matInput [matTimepicker]="pickerCierreManana" formControlName="cierreManana">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerCierreManana"/>
+              <mat-timepicker #pickerCierreManana/>
+            </mat-form-field>
+
+            <br>
+
+            <mat-form-field>
+              <mat-label>Hora de apertura Tarde</mat-label>
+              <input matInput [matTimepicker]="pickerInicioTarde" formControlName="aperturaTarde">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerInicioTarde"/>
+              <mat-timepicker #pickerInicioTarde/>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Hora de cierre Tarde</mat-label>
+              <input matInput [matTimepicker]="pickerCierreTarde" formControlName="cierreTarde">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerCierreTarde"/>
+              <mat-timepicker #pickerCierreTarde/>
+            </mat-form-field>
+          </div>
+
+          <br>
+          <mat-form-field appearance="fill">
+            <mat-label>Duración cita</mat-label>
+            <mat-select formControlName="duracionCita">
+              <mat-option *ngFor="let duracion of duracionCitaLista" [value]="duracion">
+                {{ duracion }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <!--Selección de horarios en los que se va a abrir cuando es jornada continua-->
+        <ng-container *ngIf="segundoFormulario.get('tipoJornada')?.value === 'jornadaContinua'">
+          <br>
+          <div formGroupName="formularioHorasJornadaCompleta">
+            <mat-form-field>
+              <mat-label>Hora de apertura</mat-label>
+              <input matInput [matTimepicker]="pickerInicioJornadaContinua" formControlName="apertura">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerInicioJornadaContinua"/>
+              <mat-timepicker #pickerInicioJornadaContinua/>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Hora de cierre</mat-label>
+              <input matInput [matTimepicker]="pickerCierreJornadaContinua" formControlName="cierre">
+              <mat-timepicker-toggle matIconSuffix [for]="pickerCierreJornadaContinua"/>
+              <mat-timepicker #pickerCierreJornadaContinua/>
+            </mat-form-field>
+          </div>
+          <!--Selección de duración de las citas-->
+          <br>
+          <mat-form-field appearance="fill">
+            <mat-label>Duración cita</mat-label>
+            <mat-select formControlName="duracionCita">
+              <mat-option *ngFor="let duracion of duracionCitaLista" [value]="duracion">
+                {{ duracion }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </ng-container>
     </form>
   </mat-step>

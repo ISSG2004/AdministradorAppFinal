@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup} from '@angular/forms';
+import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatStepperModule} from '@angular/material/stepper';
@@ -11,8 +11,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { PrevisualizarCitasCreadasComponent } from '../previsualizar-citas-creadas/previsualizar-citas-creadas.component';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatTimepickerModule} from '@angular/material/timepicker';
+import {provideNativeDateAdapter} from '@angular/material/core';
+import { MatDividerModule } from '@angular/material/divider';
 @Component({
   selector: 'app-formulario-creacion-cita',
+  providers: [provideNativeDateAdapter()],
   imports: [
     MatButtonModule,
     MatStepperModule,
@@ -26,20 +30,31 @@ import {MatRadioModule} from '@angular/material/radio';
     MatOption,
     CommonModule,
     PrevisualizarCitasCreadasComponent,
-    MatRadioModule
+    MatRadioModule,
+    MatTimepickerModule,
+    MatDividerModule
   ],
   templateUrl: './formulario-creacion-cita.component.html',
   styleUrl: './formulario-creacion-cita.component.css'
 })
 export class FormularioCreacionCitaComponent {
-
   //variable para no pasar de step hasta que no se haya rellenado el formulario
   isLinear = true;
+
   //variables para el formulario reactivo pt1
   primerFormulario!: FormGroup;
   diasSemanaLista: any[] = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
   //variable para el formulario reactivo pt2
   segundoFormulario!:FormGroup;
+  duracionCitaLista: any[] = ["15m", "20m","30m", "45m", "1h", "1h 30m", "2h"];
+
+  //formulario para las horas de apertura y cierre jornada partida
+  formularioHorasJornadaPartida!: FormGroup;
+
+  //formulario para las horas de apertura y cierre jornada completa
+  formularioHorasJornadaCompleta!: FormGroup;
+
   constructor(private formBuilder: FormBuilder) {}
   //creando el objeto cita
   //ponemos un calendario en el que seleccionamos fecha de inicio y fecha de fin del rango en el que vamos a crear las citas
@@ -53,10 +68,51 @@ export class FormularioCreacionCitaComponent {
       fechaFin: ['', Validators.required],
       diasLibres: [''],
     });
-    //Inicializamos el formulario reactivo pt2
+    //Inicializamos el formulario reactivo pt2 y en función del tipo de jornada que seleccionemos, se valida un formulario u otro
+    // Inicialización del FormGroup
     this.segundoFormulario = this.formBuilder.group({
-      //añadimos los campos que vamos a añadir en este formulario
-      tipoJornada: ['',Validators.required],
+      tipoJornada: ['', Validators.required],
+      formularioHorasJornadaPartida: this.formBuilder.group({
+        aperturaManana: [''],
+        cierreManana: [''],
+        aperturaTarde: [''],
+        cierreTarde: [''],
+      }),
+      formularioHorasJornadaCompleta: this.formBuilder.group({
+        apertura: [''],
+        cierre: [''],
+      }),
+      duracionCita: ['', Validators.required],
+    });
+    const jornadaCompletaGroup = this.segundoFormulario.get('formularioHorasJornadaCompleta') as FormGroup;
+    const jornadaPartidaGroup = this.segundoFormulario.get('formularioHorasJornadaPartida') as FormGroup;
+    // Desactivar ambos grupos al inicio
+    this.segundoFormulario.get('formularioHorasJornadaPartida')?.disable();
+    this.segundoFormulario.get('formularioHorasJornadaCompleta')?.disable();
+
+    // Manejar los cambios en el tipo de jornada
+    this.segundoFormulario.get('tipoJornada')?.valueChanges.subscribe((tipo) => {
+      if (tipo === 'jornadaPartida') {
+        this.segundoFormulario.get('formularioHorasJornadaCompleta')?.disable();
+        jornadaCompletaGroup.clearValidators();
+        this.segundoFormulario.get('formularioHorasJornadaPartida')?.enable();
+        jornadaPartidaGroup.get('aperturaManana')?.setValidators([Validators.required]);
+        jornadaPartidaGroup.get('cierreManana')?.setValidators([Validators.required]);
+        jornadaPartidaGroup.get('aperturaTarde')?.setValidators([Validators.required]);
+        jornadaPartidaGroup.get('cierreTarde')?.setValidators([Validators.required]);
+        jornadaPartidaGroup.setValidators(this.horaAperturaAntesQueCierreJornadaPartidaValidator());
+        jornadaPartidaGroup.updateValueAndValidity();
+      } else if (tipo === 'jornadaContinua') {
+        this.segundoFormulario.get('formularioHorasJornadaPartida')?.disable();
+        jornadaPartidaGroup.clearValidators();
+        this.segundoFormulario.get('formularioHorasJornadaCompleta')?.enable();
+        jornadaCompletaGroup.get('apertura')?.setValidators([Validators.required]);
+        jornadaCompletaGroup.get('cierre')?.setValidators([Validators.required]);
+        jornadaCompletaGroup.setValidators(this.horaAperturaAntesQueCierreJornadaCompletaValidator());
+        jornadaCompletaGroup.updateValueAndValidity();
+      }
+      // Actualizar el estado del formulario completo
+      this.segundoFormulario.updateValueAndValidity();
     });
   }
   procesarFormularios(){
@@ -69,4 +125,57 @@ export class FormularioCreacionCitaComponent {
       console.log("El primer formulario no es valido");
     }
   }
+  conversionDuracionCita(duracion: any): number {
+    switch (duracion) {
+      case "15m":
+        return 15;
+      case "20m":
+        return 20;
+      case "30m":
+        return 30;
+      case "45m":
+        return 45;
+      case "1h":
+        return 60;
+      case "1h 30m":
+        return 90;
+      case "2h":
+        return 120;
+      default:
+        return 0;
+    }
+  }
+  horaAperturaAntesQueCierreJornadaCompletaValidator(): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const apertura: Date = group.get('apertura')?.value;
+      const cierre: Date = group.get('cierre')?.value;
+      if (!apertura || !cierre) return null; // Si algún valor no está presente, no validar aún
+      // Validar que apertura sea anterior a cierre
+      return apertura >= cierre ? { horaInvalida: true } : null;
+    };
+  }
+  horaAperturaAntesQueCierreJornadaPartidaValidator(): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const aperturaManana: Date = group.get('aperturaManana')?.value;
+      const cierreManana: Date = group.get('cierreManana')?.value;
+      const aperturaTarde: Date = group.get('aperturaTarde')?.value;
+      const cierreTarde: Date = group.get('cierreTarde')?.value;
+      if (!aperturaManana || !cierreManana || !aperturaTarde || !cierreTarde) return null;
+      // Validar que apertura de la mañana sea antes que el cierre de la mañana
+      if (aperturaManana >= cierreManana) {
+        return { horarioMananaInvalido: true };
+      }
+      // Validar que apertura de la tarde sea antes que el cierre de la tarde
+      if (aperturaTarde >= cierreTarde) {
+        return { horarioTardeInvalido: true };
+      }
+      // Validar que cierre de la mañana sea antes que la apertura de la tarde
+      if (cierreManana >= aperturaTarde) {
+        return { intervaloInvalido: true };
+      }
+      return null;
+    };
+  }
+
+
 }
