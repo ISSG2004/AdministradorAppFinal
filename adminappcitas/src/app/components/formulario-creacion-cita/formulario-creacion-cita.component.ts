@@ -15,16 +15,10 @@ import {MatTimepickerModule} from '@angular/material/timepicker';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import {
-  MAT_DIALOG_DATA,
   MatDialog,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogRef,
-  MatDialogTitle,
 } from '@angular/material/dialog';
-import { Dialog } from '@angular/cdk/dialog';
 import { DialogErrorValdiacionComponent } from '../dialogs/dialog-error-valdiacion/dialog-error-valdiacion.component';
+import { Cita } from '../../models/Cita';
 @Component({
   selector: 'app-formulario-creacion-cita',
   providers: [provideNativeDateAdapter()],
@@ -130,12 +124,13 @@ export class FormularioCreacionCitaComponent {
   procesarFormularios(){
     //si el primer formulario es valido, se procesa el segundo formulario
     if(this.primerFormulario.valid && this.segundoFormulario.valid){
+      console.log(this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value));
       alert("Formulario enviado correctamente")
     }else{
       this.dialogo.open(DialogErrorValdiacionComponent)
     }
   }
-  conversionDuracionCita(duracion: any): number {
+  conversionDuracionCita(duracion:any): number {
     switch (duracion) {
       case "15m":
         return 15;
@@ -242,6 +237,102 @@ export class FormularioCreacionCitaComponent {
       return null;
     };
   }
+  //crear metodo para valdiar formularios y si no valida que no se pueda pasar el step 3 ni 4
+  calcularCitas(primerFormulario: any, segundoFormulario: any): Cita[] {
+    const citas: Cita[] = [];
 
+    const fechaInicio = new Date(primerFormulario.fechaInicio);
+    const fechaFin = new Date(primerFormulario.fechaFin);
+    fechaFin.setHours(23, 59, 59, 999); // Aseguramos incluir el último día completo
+
+    // Aseguramos que los días libres estén en número
+    let diasLibres: number[] = [];
+
+    if (typeof primerFormulario.diasLibres === 'string') {
+      diasLibres = primerFormulario.diasLibres
+        .split(',')
+        .map((d: string) => parseInt(d.trim(), 10))
+        .filter((d: number) => !isNaN(d) && d >= 0 && d <= 6);
+    } else if (Array.isArray(primerFormulario.diasLibres)) {
+      diasLibres = primerFormulario.diasLibres
+        .map((d: any) => parseInt(d, 10))
+        .filter((d: number) => !isNaN(d) && d >= 0 && d <= 6);
+    }
+
+    const duracionCitaMin = this.conversionDuracionCita(segundoFormulario.duracionCita);
+    const tipoJornada = segundoFormulario.tipoJornada;
+
+    // Bucle día a día
+    for (
+      let d = new Date(fechaInicio);
+      d <= fechaFin;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const diaActual = new Date(d);
+      const diaSemana = diaActual.getDay();
+
+      // Verificamos si este día es libre antes de continuar
+      if (diasLibres.includes(diaSemana)) continue;
+
+      if (tipoJornada === 'jornadaContinua') {
+        const apertura = new Date(segundoFormulario.formularioHorasJornadaCompleta.apertura);
+        const cierre = new Date(segundoFormulario.formularioHorasJornadaCompleta.cierre);
+
+        if (isNaN(apertura.getTime()) || isNaN(cierre.getTime())) continue;
+
+        const inicioDia = new Date(diaActual);
+        inicioDia.setHours(apertura.getHours(), apertura.getMinutes(), 0, 0);
+
+        const finDia = new Date(diaActual);
+        finDia.setHours(cierre.getHours(), cierre.getMinutes(), 0, 0);
+
+        for (
+          let horaCita = new Date(inicioDia);
+          horaCita < finDia;
+          horaCita.setMinutes(horaCita.getMinutes() + duracionCitaMin)
+        ) {
+          const cita = new Cita();
+          cita.fecha_cita = this.formatearFechaLocalISO(horaCita);
+          citas.push(cita);
+        }
+      }
+
+      if (tipoJornada === 'jornadaPartida') {
+        const form = segundoFormulario.formularioHorasJornadaPartida;
+
+        const tramos = [
+          [new Date(form.aperturaManana), new Date(form.cierreManana)],
+          [new Date(form.aperturaTarde), new Date(form.cierreTarde)],
+        ];
+
+        for (let [apertura, cierre] of tramos) {
+          if (isNaN(apertura.getTime()) || isNaN(cierre.getTime())) continue;
+
+          const inicioTramo = new Date(diaActual);
+          inicioTramo.setHours(apertura.getHours(), apertura.getMinutes(), 0, 0);
+
+          const finTramo = new Date(diaActual);
+          finTramo.setHours(cierre.getHours(), cierre.getMinutes(), 0, 0);
+
+          for (
+            let horaCita = new Date(inicioTramo);
+            horaCita < finTramo;
+            horaCita.setMinutes(horaCita.getMinutes() + duracionCitaMin)
+          ) {
+            const cita = new Cita();
+            cita.fecha_cita = this.formatearFechaLocalISO(horaCita);
+            citas.push(cita);
+          }
+        }
+      }
+    }
+
+    return citas;
+  }
+
+  formatearFechaLocalISO(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+  }
 }
 
