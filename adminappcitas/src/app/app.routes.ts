@@ -4,12 +4,17 @@ import { LoginNegociosComponent } from './components/login-negocios/login-negoci
 
 export const routes: Routes = [
   {
-    path: 'Home',
-    component: DashboardComponent,
-    //añadir canActivate: [AuthGuard] para proteger la ruta
-  },{
     path: '',
-    component:LoginNegociosComponent
-    //añadir canActivate: [NoAuthGuard] para proteger la ruta
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: 'login',
+    component: LoginNegociosComponent
+  },
+  {
+    path: 'home',
+    component: DashboardComponent
   }
 ];
+
