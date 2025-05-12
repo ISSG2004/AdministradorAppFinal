@@ -1,11 +1,54 @@
-import { Component } from '@angular/core';
+import { DataBaseNegocioService } from './../../services/dataBaseNegocio.service';
+import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormControl} from '@angular/forms';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-negocios',
-  imports: [],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-negocios.component.html',
-  styleUrl: './login-negocios.component.css'
+  styleUrls: ['./login-negocios.component.css'],
 })
 export class LoginNegociosComponent {
+  formularioLogin!: FormGroup;
+  formularioRegistro!: FormGroup;
+  mostrarLogin: boolean = true;
 
+  constructor(private fb: FormBuilder,private dbNegocio:DataBaseNegocioService) {}
+
+  ngOnInit() {
+    this.formularioLogin = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
+    this.formularioRegistro = this.fb.group({
+      nombre: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+      password2: ['', [Validators.required]],
+      telefono: ['', [Validators.required]],
+    });
+  }
+  toggleForm(): void {
+    this.mostrarLogin = !this.mostrarLogin;
+  }
+  validarLogin(): void {
+    if (this.formularioLogin.valid) {
+      let { email, password } = this.formularioLogin.getRawValue();
+    }
+  }
 }
+
