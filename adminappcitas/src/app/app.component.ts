@@ -9,8 +9,6 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     RouterOutlet,
-    FormularioCreacionCitaComponent,
-    LoginNegociosComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

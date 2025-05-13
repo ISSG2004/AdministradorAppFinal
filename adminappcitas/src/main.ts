@@ -31,7 +31,7 @@ bootstrapApplication(AppComponent, {
     { provide: LOCALE_ID, useValue: 'es-ES' },
     importProvidersFrom(MatNativeDateModule),
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
-    provideFirebaseApp(() => initializeApp(environment)),  // Solo inicializa Firebase una vez
+    provideFirebaseApp(() => initializeApp(environment.firebase)),  // Solo inicializa Firebase una vez
     provideAuth(() => getAuth()),  // Configuración de autenticación
     provideFirestore(() => getFirestore()),  // Configuración de Firestore
     provideDatabase(() => getDatabase()),  // Configuración de Realtime Database
