@@ -2,12 +2,6 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 
-// Firebase
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-import { provideDatabase, getDatabase } from '@angular/fire/database';
-import { environment } from './app/environments/firebase.config';
 
 // Material Datepicker
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -31,10 +25,6 @@ bootstrapApplication(AppComponent, {
     { provide: LOCALE_ID, useValue: 'es-ES' },
     importProvidersFrom(MatNativeDateModule),
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
-    provideFirebaseApp(() => initializeApp(environment.firebase)),  // Solo inicializa Firebase una vez
-    provideAuth(() => getAuth()),  // Configuración de autenticación
-    provideFirestore(() => getFirestore()),  // Configuración de Firestore
-    provideDatabase(() => getDatabase()),  // Configuración de Realtime Database
     provideAnimations(),
   ],
 }).catch((err) => console.error(err));

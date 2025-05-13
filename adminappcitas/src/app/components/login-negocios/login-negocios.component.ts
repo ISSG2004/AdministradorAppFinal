@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { Auth } from '@angular/fire/auth';
+//import { Auth } from '@angular/fire/auth';
 //import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -28,7 +28,7 @@ export class LoginNegociosComponent {
   formularioRegistro!: FormGroup;
   mostrarLogin: boolean = true;
 
-  constructor(private fb: FormBuilder,/*private dbNegocios:DataBaseNegocioService*/private auth:Auth) {}
+  constructor(private fb: FormBuilder,/*private dbNegocios:DataBaseNegocioService*/) {}
   /*
     Revisar el servicio negocios y todo lo relacionado con auth, ya que es lo queda problemas
   */
