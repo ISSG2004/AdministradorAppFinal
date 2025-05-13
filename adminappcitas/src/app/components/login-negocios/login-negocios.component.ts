@@ -27,8 +27,10 @@ export class LoginNegociosComponent {
   formularioRegistro!: FormGroup;
   mostrarLogin: boolean = true;
 
-  constructor(private fb: FormBuilder,private dbNegocio:DataBaseNegocioService) {}
-
+  constructor(private fb: FormBuilder,/*private dbNegocios:DataBaseNegocioService*/) {}
+  /*
+    Revisar el servicio negocios y todo lo relacionado con auth, ya que es lo queda problemas
+  */
   ngOnInit() {
     this.formularioLogin = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -42,9 +44,12 @@ export class LoginNegociosComponent {
       telefono: ['', [Validators.required]],
     });
   }
-  toggleForm(): void {
-    this.mostrarLogin = !this.mostrarLogin;
-  }
+
+toggleForm(mostrarLogin: boolean): void {
+  this.mostrarLogin = mostrarLogin;
+}
+
+
   validarLogin(): void {
     if (this.formularioLogin.valid) {
       let { email, password } = this.formularioLogin.getRawValue();

@@ -1,47 +1,30 @@
 import { Injectable, inject } from '@angular/core';
-import { Database, ref, set, update, remove, get, child, push } from '@angular/fire/database';
+import { Database, ref, set, update, remove, get, child, push, onValue } from '@angular/fire/database';
 import { Auth } from '@angular/fire/auth';
 import { Cita } from '../models/Cita';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, BehaviorSubject } from 'rxjs';
+import { FirebaseApp } from '@angular/fire/app';
+import { objectVal } from '@angular/fire/database';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataBaseCitaService {
   private db = inject(Database);
-  private auth = inject(Auth);
   private dbPath = '/citas';
 
   constructor() {}
 
-  // Obtener todas las citas (sin reactividad)
-  async getAll(): Promise<Cita[]> {
+  // Obtener todas las citas en tiempo real
+  getAll(): Observable<Record<string, Cita>> {
     const dbRef = ref(this.db, this.dbPath);
-    const snapshot = await get(dbRef);
-    return snapshot.exists() ? Object.values(snapshot.val()) : [];
+    return objectVal(dbRef);
   }
 
-  // Obtener todas las citas (reactivo)
-  getAllReactive(): Observable<Cita[]> {
-    const dbRef = ref(this.db, this.dbPath);
-    return from(get(dbRef)).pipe(
-      map(snapshot => (snapshot.exists() ? Object.values(snapshot.val()) : []))
-    );
-  }
-
-  // Obtener una cita por su ID (sin reactividad)
-  async getById(id: string): Promise<Cita | null> {
+  // Obtener una cita por su ID en tiempo real
+  getById(id: string): Observable<Cita | null> {
     const dbRef = ref(this.db, `${this.dbPath}/${id}`);
-    const snapshot = await get(dbRef);
-    return snapshot.exists() ? snapshot.val() : null;
-  }
-
-  // Obtener una cita por su ID (reactivo)
-  getByIdReactive(id: string): Observable<Cita | null> {
-    const dbRef = ref(this.db, `${this.dbPath}/${id}`);
-    return from(get(dbRef)).pipe(
-      map(snapshot => (snapshot.exists() ? snapshot.val() : null))
-    );
+    return objectVal(dbRef);
   }
 
   // Crear una nueva cita
@@ -69,4 +52,3 @@ export class DataBaseCitaService {
     await remove(dbRef);
   }
 }
-

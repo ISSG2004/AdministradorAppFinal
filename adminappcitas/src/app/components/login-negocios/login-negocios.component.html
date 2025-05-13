@@ -1,7 +1,7 @@
 <div class="container-fluid bg-primary py-2">
   <div class="d-flex justify-content-center">
-    <button class="btn btn-primary me-2" (click)="toggleForm()" [class.active]="mostrarLogin">Iniciar sesión</button>
-    <button class="btn btn-primary me-2" (click)="toggleForm()" [class.active]="!mostrarLogin">Registrarse</button>
+    <button class="btn btn-primary me-2" (click)="toggleForm(true)" [class.active]="mostrarLogin">Iniciar sesión</button>
+    <button class="btn btn-primary me-2" (click)="toggleForm(false)" [class.active]="!mostrarLogin">Registrarse</button>
   </div>
 </div>
 
