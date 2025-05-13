@@ -10,6 +10,6 @@ export class FirebaseService {
 
   constructor() {
     this.app = initializeApp(environment.firebaseConfig);
-    console.log("Firebase initialized:", this.app);
+    
   }
 }

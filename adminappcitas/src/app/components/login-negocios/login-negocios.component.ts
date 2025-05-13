@@ -57,7 +57,19 @@ toggleForm(mostrarLogin: boolean): void {
   validarLogin(): void {
     if (this.formularioLogin.valid) {
       let { email, password } = this.formularioLogin.getRawValue();
+      this.auth.login(email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log('Usuario logueado:', user);
+          // Aquí puedes redirigir al usuario a otra página o realizar otras acciones
+        })
+        .catch((error) => {
+          console.error('Error al iniciar sesión:', error);
+          // Aquí puedes mostrar un mensaje de error al usuario
+        });
     }
   }
+
 }
 
