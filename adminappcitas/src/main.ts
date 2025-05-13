@@ -7,7 +7,7 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideDatabase, getDatabase } from '@angular/fire/database';
-import { environment } from './firebase.config';
+import { environment } from './app/environments/firebase.config';
 
 // Material Datepicker
 import { provideNativeDateAdapter } from '@angular/material/core';
