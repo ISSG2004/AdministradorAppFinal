@@ -1,7 +1,7 @@
+import { environment } from './environments/environment';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-
 
 // Material Datepicker
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -26,5 +26,6 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(MatNativeDateModule),
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
     provideAnimations(),
+    //firebase
   ],
 }).catch((err) => console.error(err));

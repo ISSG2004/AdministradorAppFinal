@@ -1,12 +1,13 @@
-//import { DataBaseNegocioService } from './../../services/dataBaseNegocio.service';
+
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormControl} from '@angular/forms';
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-//import { Auth } from '@angular/fire/auth';
-//import { AuthService } from '../../services/auth.service';
+import { Auth } from '@angular/fire/auth';
+import { AuthService } from '../../services/auth.service';
+
 
 @Component({
   selector: 'app-login-negocios',
@@ -19,6 +20,8 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatButtonModule
   ],
+  providers: [AuthService],
+
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-negocios.component.html',
   styleUrls: ['./login-negocios.component.css'],
@@ -28,7 +31,7 @@ export class LoginNegociosComponent {
   formularioRegistro!: FormGroup;
   mostrarLogin: boolean = true;
 
-  constructor(private fb: FormBuilder,/*private dbNegocios:DataBaseNegocioService*/) {}
+  constructor(private fb: FormBuilder,private auth:AuthService) {}
   /*
     Revisar el servicio negocios y todo lo relacionado con auth, ya que es lo queda problemas
   */
