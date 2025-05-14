@@ -44,15 +44,13 @@ import { AuthService } from '../../services/auth.service';
     MatRadioModule,
     MatTimepickerModule,
     MatDividerModule,
+    CommonModule
     //DialogErrorValdiacionComponent
   ],
   templateUrl: './formulario-creacion-cita.component.html',
   styleUrl: './formulario-creacion-cita.component.css'
 })
 export class FormularioCreacionCitaComponent {
-enviarDatos() {
-throw new Error('Method not implemented.');
-}
   //variable para no pasar de step hasta que no se haya rellenado el formulario
   isLinear = true;
 
@@ -71,8 +69,8 @@ throw new Error('Method not implemented.');
   formularioHorasJornadaCompleta!: FormGroup;
   //emiter
   @Output() enviarCitasOut = new EventEmitter<Cita[]>();
-  
   citas: Cita[] = [];
+
   constructor(
     private formBuilder: FormBuilder,
     private dialogo:MatDialog,
@@ -260,7 +258,7 @@ throw new Error('Method not implemented.');
   }
   //crear metodo para valdiar formularios y si no valida que no se pueda pasar el step 3 ni 4
   calcularCitas(primerFormulario: any, segundoFormulario: any): Cita[] {
-    let citas: Cita[] = [];
+    //let citas: Cita[] = [];
 
     let fechaInicio = new Date(primerFormulario.fechaInicio);
     let fechaFin = new Date(primerFormulario.fechaFin);
@@ -321,7 +319,7 @@ throw new Error('Method not implemented.');
         ) {
           const cita = new Cita();
           cita.fecha_cita = this.formatearFechaLocalISO(horaCita);
-          citas.push(cita);
+          this.citas.push(cita);
         }
       }
 
@@ -349,19 +347,17 @@ throw new Error('Method not implemented.');
           ) {
             let cita = new Cita();
             cita.fecha_cita = this.formatearFechaLocalISO(horaCita);
-            citas.push(cita);
+            this.citas.push(cita);
           }
         }
       }
     }
-
-    return citas;
+    return this.citas;
   }
   formatearFechaLocalISO(date: Date): string {
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
   }
-
 
   enviarCitas(){
     // Aquí calculamos las citas usando los valores de los formularios

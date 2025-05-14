@@ -1,9 +1,9 @@
-<ng-container>
+<ng-container *ngFor="let cita of citas">
   <mat-accordion>
     <!-- Mostrar las citas creadas por el usuario con un ngFor -->
     <mat-expansion-panel (opened)="panelEstado.set(true)" (closed)="panelEstado.set(false)">
       <mat-expansion-panel-header>
-        <mat-panel-title> Dia Fecha </mat-panel-title>
+        <mat-panel-title> {{cita.fecha_cita}} </mat-panel-title>
       </mat-expansion-panel-header>
       <!--Mostrar cartas/tarjetas de las fechas de ese día con sus hora de inicio-->
       <!--A cada item añadirle un botón para eliminarlo si el usuario desea-->

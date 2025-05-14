@@ -111,7 +111,7 @@
     </form>
   </mat-step>
   <!--Revisión de citas-->
-  <mat-step (interacted)="enviarCitas()">
+  <mat-step selectionChange="enviarCitas()" >
     <ng-template matStepLabel>Revisión de citas</ng-template>
     <app-previsualizar-citas-creadas [citas]="citas"></app-previsualizar-citas-creadas>
   </mat-step>
