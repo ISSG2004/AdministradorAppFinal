@@ -10,7 +10,6 @@ import { DBNegocioService } from './dbnegocio.service';
 export class AuthService {
   private auth: Auth;
   private router:Router=inject(Router);
-  //private dbNegocio = inject(DBNegocioService);
   constructor(private firebaseService: FirebaseService) {
     this.auth = getAuth(this.firebaseService.app);
   }

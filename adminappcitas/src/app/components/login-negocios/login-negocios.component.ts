@@ -4,7 +4,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { Auth } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth.service';
 import { DBNegocioService } from '../../services/dbnegocio.service';
 
@@ -57,9 +56,17 @@ toggleForm(mostrarLogin: boolean): void {
   validarLogin(): void {
     if (this.formularioLogin.valid) {
       let { email, password } = this.formularioLogin.getRawValue();
-      this.auth.login(email, password);
+      this.dbNegocio.getNegocios().subscribe((negocios) => {
+        let negocio = negocios.find((negocio) => negocio.email === email);
+        if (negocio) {
+          this.auth.login(email, password);
+        } else {
+          //mostrar algún error (Emergente)
+        }
+      });
     }
   }
+
   async validarRegistro(): Promise<void> {
     if (this.formularioRegistro.valid) {
       let { nombre, email, password, telefono } = this.formularioRegistro.getRawValue();

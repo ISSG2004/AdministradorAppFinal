@@ -19,9 +19,10 @@ import {
 } from '@angular/material/dialog';
 import { DialogErrorValdiacionComponent } from '../dialogs/dialog-error-valdiacion/dialog-error-valdiacion.component';
 import { Cita } from '../../models/Cita';
+import { DBNegocioService } from '../../services/dbnegocio.service';
 @Component({
   selector: 'app-formulario-creacion-cita',
-  providers: [provideNativeDateAdapter()],
+  providers: [provideNativeDateAdapter(), DBNegocioService],
   imports: [
     MatButtonModule,
     MatStepperModule,
@@ -38,7 +39,7 @@ import { Cita } from '../../models/Cita';
     MatRadioModule,
     MatTimepickerModule,
     MatDividerModule,
-    DialogErrorValdiacionComponent
+    //DialogErrorValdiacionComponent
   ],
   templateUrl: './formulario-creacion-cita.component.html',
   styleUrl: './formulario-creacion-cita.component.css'
@@ -61,7 +62,7 @@ export class FormularioCreacionCitaComponent {
   //formulario para las horas de apertura y cierre jornada completa
   formularioHorasJornadaCompleta!: FormGroup;
 
-  constructor(private formBuilder: FormBuilder,private dialogo:MatDialog) {}
+  constructor(private formBuilder: FormBuilder,private dialogo:MatDialog, private dbNegocio:DBNegocioService) {}
   //creando el objeto cita
   //ponemos un calendario en el que seleccionamos fecha de inicio y fecha de fin del rango en el que vamos a crear las citas
   //ponemos un item para seleccionar los horarios de apertura del negocio (ver como hacer para seleccionar el horario en jornada partida)
