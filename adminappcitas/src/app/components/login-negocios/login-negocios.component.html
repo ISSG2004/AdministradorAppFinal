@@ -20,7 +20,7 @@
       <button class="btn btn-primary w-100" [disabled]="!formularioLogin.valid">Iniciar sesión</button>
     </form>
 
-    <form [formGroup]="formularioRegistro" *ngIf="!mostrarLogin">
+    <form [formGroup]="formularioRegistro" *ngIf="!mostrarLogin" (ngSubmit)="validarRegistro()">
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre del negocio*</label>
         <input type="text" id="nombre" class="form-control" formControlName="nombre" placeholder="Nombre del negocio">
@@ -28,6 +28,10 @@
       <div class="mb-3">
         <label for="email" class="form-label">Email*</label>
         <input type="email" id="email" class="form-control" formControlName="email" placeholder="Email">
+      </div>
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono*</label>
+        <input type="telefono" id="telefono" class="form-control" formControlName="telefono" placeholder="Teléfono">
       </div>
       <div class="mb-3">
         <label for="password" class="form-label">Contraseña*</label>

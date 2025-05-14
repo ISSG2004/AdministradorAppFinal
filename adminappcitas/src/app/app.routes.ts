@@ -13,12 +13,12 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginNegociosComponent,
-    canActivate: [AuthGuard]
+    //canActivate: [AuthGuard]
   },
   {
     path: 'home',
     component: DashboardComponent,
-    canActivate: [AuthGuard]
+    //canActivate: [AuthGuard]
   }
 ];
 

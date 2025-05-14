@@ -1,5 +1,5 @@
 export class Negocio {
-  id: number;
+  id: any;
   nombre: string;
   direccion: string;
   telefono: string;
@@ -7,7 +7,7 @@ export class Negocio {
   password: string;
   tipo_negocio: string;
   constructor() {
-    this.id = 0;
+    this.id ='';
     this.nombre = '';
     this.direccion = '';
     this.telefono = '';

@@ -10,8 +10,8 @@ export class NoAuthGuard implements CanActivate {
     const user = this.auth.getCurrentUser();
     if (user) {
       this.router.navigate(['/home']);
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 }

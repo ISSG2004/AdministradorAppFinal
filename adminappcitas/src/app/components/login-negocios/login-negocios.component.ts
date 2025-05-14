@@ -1,4 +1,3 @@
-
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormControl} from '@angular/forms';
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { Auth } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth.service';
+import { DBNegocioService } from '../../services/dbnegocio.service';
 
 
 @Component({
@@ -20,7 +20,7 @@ import { AuthService } from '../../services/auth.service';
     MatInputModule,
     MatButtonModule
   ],
-  providers: [AuthService],
+  providers: [AuthService,DBNegocioService],
 
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-negocios.component.html',
@@ -31,7 +31,7 @@ export class LoginNegociosComponent {
   formularioRegistro!: FormGroup;
   mostrarLogin: boolean = true;
 
-  constructor(private fb: FormBuilder,private auth:AuthService) {}
+  constructor(private fb: FormBuilder,private auth:AuthService, private dbNegocio:DBNegocioService) {}
   /*
     Revisar el servicio negocios y todo lo relacionado con auth, ya que es lo queda problemas
   */
@@ -45,7 +45,7 @@ export class LoginNegociosComponent {
       nombre: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
-      password2: ['', [Validators.required]],
+      password2: [''],
       telefono: ['', [Validators.required]],
     });
   }
@@ -58,6 +58,24 @@ toggleForm(mostrarLogin: boolean): void {
     if (this.formularioLogin.valid) {
       let { email, password } = this.formularioLogin.getRawValue();
       this.auth.login(email, password);
+    }
+  }
+  async validarRegistro(): Promise<void> {
+    if (this.formularioRegistro.valid) {
+      let { nombre, email, password, telefono } = this.formularioRegistro.getRawValue();
+      await this.auth.register(email, password, nombre, telefono);
+      let negocio = {
+        id: this.auth.getCurrentUser()?.uid,
+        nombre: nombre,
+        email: email,
+        password: password,
+        telefono: telefono,
+        tipo_negocio: '',
+        direccion: '',
+      };
+      await this.dbNegocio.createNegocio(this.auth.getCurrentUser()?.uid,negocio).then(() => {
+        this.auth.login(email, password);
+      })
     }
   }
 }
