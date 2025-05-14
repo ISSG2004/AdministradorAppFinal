@@ -36,6 +36,7 @@ export class LoginNegociosComponent {
     Revisar el servicio negocios y todo lo relacionado con auth, ya que es lo queda problemas
   */
   ngOnInit() {
+   // console.log(this.auth);
     this.formularioLogin = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
@@ -53,23 +54,11 @@ toggleForm(mostrarLogin: boolean): void {
   this.mostrarLogin = mostrarLogin;
 }
 
-
   validarLogin(): void {
     if (this.formularioLogin.valid) {
       let { email, password } = this.formularioLogin.getRawValue();
-      this.auth.login(email, password)
-        .then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          console.log('Usuario logueado:', user);
-          // Aquí puedes redirigir al usuario a otra página o realizar otras acciones
-        })
-        .catch((error) => {
-          console.error('Error al iniciar sesión:', error);
-          // Aquí puedes mostrar un mensaje de error al usuario
-        });
+      this.auth.login(email, password);
     }
   }
-
 }
 
