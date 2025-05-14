@@ -6,25 +6,25 @@ import { BehaviorSubject, Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class DBNegocioService {
+export class DbcitasService {
   private db:any  ;
-  private path='/negocios';
-  private negociosSubject = new BehaviorSubject<any[]>([]);
-  negocios$ = this.negociosSubject.asObservable();
+  private path='/citas';
+  private citasSubject = new BehaviorSubject<any[]>([]);
+  negocios$ = this.citasSubject.asObservable();
 
   constructor(private firebaseService: FirebaseService) {
     this.db = getDatabase(this.firebaseService.app);
   }
 
-  async createNegocio(userUID:any,negocio: any): Promise<void> {
-    let negocioRef = ref(this.db, `${this.path}/${userUID}`);
-    await set(negocioRef, negocio);
+  async createCita(cita: any): Promise<void> {
+    let citaRef = ref(this.db, `${this.path}/${cita.id}`);
+    await set(citaRef, cita);
   }
 
-  getNegocio(userUID: string): Observable<any> {
-    let negocioRef = ref(this.db, `${this.path}/${userUID}`);
+  getCita(citaID: string): Observable<any> {
+    let citaRef = ref(this.db, `${this.path}/${citaID}`);
     return new Observable((observer) => {
-      onValue(negocioRef, (snapshot: DataSnapshot) => {
+      onValue(citaRef, (snapshot: DataSnapshot) => {
         if (snapshot.exists()) {
           // Emitimos los datos del negocio en tiempo real cada vez que cambian
           observer.next(snapshot.val());
@@ -40,27 +40,29 @@ export class DBNegocioService {
     });
   }
 
-  getNegocios(): Observable<any[]> {
+  getCitas(userUID:any): Observable<any[]> {//buscar como añadir que solo busque las citas que solo coinciden con el id de usuario(uid)
     // Creamos una referencia al nodo que utilizamos
-    let negocioRef = ref(this.db, this.path);
+    let citaRef = ref(this.db, this.path);
     // Devolvemos un Observable que envia los datos en tiempo real
     return new Observable((observer) => {
       // Obtenemos los datos en tiempo real con onValue
       onValue(
-        negocioRef,
+        citaRef,
         (snapshot) => {
-          let negocios: any[] = [];
+          let citas: any[] = [];
           // Recorremos cada hijo del snapshot para construir la lista de negocios.
           snapshot.forEach((childSnapshot: DataSnapshot) => {
-            // Obtenemos los datos del negocio
-            let negocio = childSnapshot.val();
-            // Agregamos el ID como una propiedad del objeto
-            negocio.id = childSnapshot.key;
-            // Añadimos el negocio al array
-            negocios.push(negocio);
-          });
+              // Obtenemos los datos del negocio
+              let cita = childSnapshot.val();
+              //validamos que el id del negocio coincida con el id del usuario
+              if (cita.usuario_id === userUID) {
+                // Agregamos el ID como una propiedad del objeto
+                cita.id = childSnapshot.key;
+                citas.push(cita);
+              }
+            });
           // eviamos la lista actualizada mediante un subscribe
-          observer.next(negocios);
+          observer.next(citas);
         },
         (error) => {
           console.error("Error al obtener los negocios:", error);

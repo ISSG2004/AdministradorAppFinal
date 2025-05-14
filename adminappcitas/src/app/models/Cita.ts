@@ -1,14 +1,14 @@
 export class Cita {
-  id: string;
+  id: any;
   fecha_cita: string;
   estado: string;//disponible, reservada
-  usuario_id: number;
-  negocio_id: number;
+  usuario_id: any;
+  negocio_id: any;
   constructor() {
     this.id = '';
     this.fecha_cita = '';
     this.estado = "disponible";
-    this.usuario_id = 0;
-    this.negocio_id = 0;
+    this.usuario_id = '';
+    this.negocio_id = '';
   }
 }

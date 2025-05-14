@@ -1,3 +1,4 @@
+import { CitasPrevisualizadasService } from './../../services/citas-previsualizadas.service';
 import { Component } from '@angular/core';
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
@@ -10,19 +11,25 @@ import { MatOption } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { PrevisualizarCitasCreadasComponent } from '../previsualizar-citas-creadas/previsualizar-citas-creadas.component';
-import {MatRadioModule} from '@angular/material/radio';
-import {MatTimepickerModule} from '@angular/material/timepicker';
-import {provideNativeDateAdapter} from '@angular/material/core';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatTimepickerModule } from '@angular/material/timepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
-import {
-  MatDialog,
-} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { DialogErrorValdiacionComponent } from '../dialogs/dialog-error-valdiacion/dialog-error-valdiacion.component';
 import { Cita } from '../../models/Cita';
 import { DBNegocioService } from '../../services/dbnegocio.service';
+import { DbcitasService } from '../../services/dbcitas.service';
+import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-formulario-creacion-cita',
-  providers: [provideNativeDateAdapter(), DBNegocioService],
+  providers: [
+    provideNativeDateAdapter(),
+    DBNegocioService,
+    DbcitasService,AuthService,
+    CitasPrevisualizadasService
+  ],
+  standalone: true,
   imports: [
     MatButtonModule,
     MatStepperModule,
@@ -45,6 +52,9 @@ import { DBNegocioService } from '../../services/dbnegocio.service';
   styleUrl: './formulario-creacion-cita.component.css'
 })
 export class FormularioCreacionCitaComponent {
+enviarDatos() {
+throw new Error('Method not implemented.');
+}
   //variable para no pasar de step hasta que no se haya rellenado el formulario
   isLinear = true;
 
@@ -61,8 +71,14 @@ export class FormularioCreacionCitaComponent {
 
   //formulario para las horas de apertura y cierre jornada completa
   formularioHorasJornadaCompleta!: FormGroup;
-
-  constructor(private formBuilder: FormBuilder,private dialogo:MatDialog, private dbNegocio:DBNegocioService) {}
+  constructor(
+    private formBuilder: FormBuilder,
+    private dialogo:MatDialog,
+    private dbNegocio:DBNegocioService,
+    private auth:AuthService,
+    private dbCitas:DbcitasService,
+    //private enviarCitasService: CitasPrevisualizadasService
+  ) {}
   //creando el objeto cita
   //ponemos un calendario en el que seleccionamos fecha de inicio y fecha de fin del rango en el que vamos a crear las citas
   //ponemos un item para seleccionar los horarios de apertura del negocio (ver como hacer para seleccionar el horario en jornada partida)
@@ -125,7 +141,18 @@ export class FormularioCreacionCitaComponent {
   procesarFormularios(){
     //si el primer formulario es valido, se procesa el segundo formulario
     if(this.primerFormulario.valid && this.segundoFormulario.valid){
-      console.log(this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value));
+      //console.log(this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value));
+      this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value).forEach(cita => {
+        let citaCreada = {
+          id: cita.fecha_cita,
+          fecha_cita: cita.fecha_cita,
+          negocio_id: this.auth.getCurrentUser()?.uid,
+          usuario_id: 0,
+          estado: "disponible"
+        }
+        console.log(citaCreada);
+      });
+      //this.dbCitas.createCita(this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value))
       alert("Formulario enviado correctamente")
     }else{
       this.dialogo.open(DialogErrorValdiacionComponent)
@@ -196,25 +223,21 @@ export class FormularioCreacionCitaComponent {
       cierreTardeCtrl?.setErrors(null);
 
       let hasError = false;
-
       if (aperturaManana >= cierreManana) {
         aperturaMananaCtrl?.setErrors({ horarioMananaInvalido: true });
         cierreMananaCtrl?.setErrors({ horarioMananaInvalido: true });
         hasError = true;
       }
-
       if (aperturaTarde >= cierreTarde) {
         aperturaTardeCtrl?.setErrors({ horarioTardeInvalido: true });
         cierreTardeCtrl?.setErrors({ horarioTardeInvalido: true });
         hasError = true;
       }
-
       if (cierreManana >= aperturaTarde) {
         cierreMananaCtrl?.setErrors({ intervaloInvalido: true });
         aperturaTardeCtrl?.setErrors({ intervaloInvalido: true });
         hasError = true;
       }
-
       return hasError ? { horarioInvalido: true } : null;
     };
   }
@@ -223,18 +246,14 @@ export class FormularioCreacionCitaComponent {
     return (control: AbstractControl): ValidationErrors | null => {
       const rawValue = control.value;
       if (!rawValue) return null;
-
       const fechaInicio = new Date(rawValue);
       if (isNaN(fechaInicio.getTime())) return { fechaInvalida: true }; // Por si no es una fecha válida
-
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
       fechaInicio.setHours(0, 0, 0, 0);
-
       if (fechaInicio < hoy) {
         return { fechaInvalida: true };
       }
-
       return null;
     };
   }
@@ -341,6 +360,11 @@ export class FormularioCreacionCitaComponent {
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
   }
+  enviarCitas(){
+    // Aquí calculamos las citas usando los valores de los formularios
+    let citas:Cita[]= this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value);
 
+
+  }
 }
 
