@@ -1,5 +1,4 @@
-import { CitasPrevisualizadasService } from './../../services/citas-previsualizadas.service';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -26,8 +25,7 @@ import { AuthService } from '../../services/auth.service';
   providers: [
     provideNativeDateAdapter(),
     DBNegocioService,
-    DbcitasService,AuthService,
-    CitasPrevisualizadasService
+    DbcitasService,AuthService
   ],
   standalone: true,
   imports: [
@@ -71,13 +69,16 @@ throw new Error('Method not implemented.');
 
   //formulario para las horas de apertura y cierre jornada completa
   formularioHorasJornadaCompleta!: FormGroup;
+  //emiter
+  @Output() enviarCitasOut = new EventEmitter<Cita[]>();
+  
+  citas: Cita[] = [];
   constructor(
     private formBuilder: FormBuilder,
     private dialogo:MatDialog,
     private dbNegocio:DBNegocioService,
     private auth:AuthService,
     private dbCitas:DbcitasService,
-    //private enviarCitasService: CitasPrevisualizadasService
   ) {}
   //creando el objeto cita
   //ponemos un calendario en el que seleccionamos fecha de inicio y fecha de fin del rango en el que vamos a crear las citas
@@ -360,11 +361,12 @@ throw new Error('Method not implemented.');
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
   }
+
+
   enviarCitas(){
     // Aquí calculamos las citas usando los valores de los formularios
-    let citas:Cita[]= this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value);
-
-
+    this.citas = this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value);
+    this.enviarCitasOut.emit(this.citas);
   }
 }
 
