@@ -1,8 +1,7 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, signal, SimpleChanges} from '@angular/core';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from '@angular/core';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { Cita } from '../../models/Cita';
 import { MatCardModule } from '@angular/material/card';
-import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -16,36 +15,45 @@ import { CommonModule } from '@angular/common';
   templateUrl: './previsualizar-citas-creadas.component.html',
   styleUrl: './previsualizar-citas-creadas.component.css'
 })
-export class PrevisualizarCitasCreadasComponent{
-  panelEstado= signal(false);
+export class PrevisualizarCitasCreadasComponent implements OnChanges {
+  panelEstado = signal(false);
+
   @Input() citas: Cita[] = [];
-  @Output() citasActualizadas = new EventEmitter<any[]>();
-  citasAgrupadas: { [key: string]: any[] } = {};
+  @Output() citasActualizadas = new EventEmitter<Cita[]>();
+
+  citasAgrupadas: { [key: string]: Cita[] } = {};
   fechas: string[] = [];
 
-  constructor () {}
+  constructor() {}
+
   ngOnChanges(changes: SimpleChanges) {
-    console.log('Citas recibidas del padre:', this.citas);
-    if(this.citas.length>0){
+    if (changes['citas'] && this.citas && this.citas.length > 0) {
       this.citasAgrupadas = this.agruparCitasPorDia(this.citas);
+      this.fechas = Object.keys(this.citasAgrupadas).sort();
       console.log('Citas agrupadas:', this.citasAgrupadas);
+    } else {
+      this.citasAgrupadas = {};
+      this.fechas = [];
     }
-      //ver como hacer la logica para agrupar las citas en cada desplegable las de un día
   }
+
   eliminarCita(cita: Cita) {
     const index = this.citas.indexOf(cita);
     if (index !== -1) {
       this.citas.splice(index, 1);
       this.citasActualizadas.emit(this.citas);
+      // Recalcular agrupación y fechas tras eliminar
+      this.citasAgrupadas = this.agruparCitasPorDia(this.citas);
+      this.fechas = Object.keys(this.citasAgrupadas).sort();
     }
   }
-  agruparCitasPorDia(citas: any[]): { [key: string]: any[] } {
-    return citas.reduce((acc: { [key: string]: any[] }, cita) => {
-      // Verificar si la fecha es válida
+
+  agruparCitasPorDia(citas: Cita[]): { [key: string]: Cita[] } {
+    return citas.reduce((acc: { [key: string]: Cita[] }, cita) => {
       const fechaCita = new Date(cita.fecha_cita);
       if (isNaN(fechaCita.getTime())) {
-        console.warn(`Fecha inválida encontrada: ${cita.fecha_cita}`);
-        return acc; // Saltar esta cita
+        console.warn(`Fecha inválida: ${cita.fecha_cita}`);
+        return acc;
       }
       const fecha = fechaCita.toISOString().split('T')[0];
       if (!acc[fecha]) {
@@ -56,4 +64,3 @@ export class PrevisualizarCitasCreadasComponent{
     }, {});
   }
 }
-
