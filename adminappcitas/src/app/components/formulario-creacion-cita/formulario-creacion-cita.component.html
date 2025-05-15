@@ -1,4 +1,4 @@
-<mat-stepper orientation="vertical" [linear]="isLinear" #steeper>
+<mat-stepper orientation="vertical" [linear]="isLinear" #steeper (selectionChange)="onStepChange($event)">
   <!--Paso 1-->
   <mat-step [stepControl]="primerFormulario" >
     <form [formGroup]="primerFormulario">
@@ -111,9 +111,9 @@
     </form>
   </mat-step>
   <!--Revisión de citas-->
-  <mat-step selectionChange="enviarCitas()" >
+  <mat-step>
     <ng-template matStepLabel>Revisión de citas</ng-template>
-    <app-previsualizar-citas-creadas [citas]="citas"></app-previsualizar-citas-creadas>
+      <app-previsualizar-citas-creadas [citas]="citas"></app-previsualizar-citas-creadas>
   </mat-step>
   <!--Crear citas-->
   <mat-step >

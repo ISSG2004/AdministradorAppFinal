@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, signal } from '@angular/core';
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -20,6 +20,7 @@ import { Cita } from '../../models/Cita';
 import { DBNegocioService } from '../../services/dbnegocio.service';
 import { DbcitasService } from '../../services/dbcitas.service';
 import { AuthService } from '../../services/auth.service';
+import { MatExpansionModule } from '@angular/material/expansion';
 @Component({
   selector: 'app-formulario-creacion-cita',
   providers: [
@@ -44,7 +45,8 @@ import { AuthService } from '../../services/auth.service';
     MatRadioModule,
     MatTimepickerModule,
     MatDividerModule,
-    CommonModule
+    CommonModule,
+    MatExpansionModule
     //DialogErrorValdiacionComponent
   ],
   templateUrl: './formulario-creacion-cita.component.html',
@@ -67,10 +69,10 @@ export class FormularioCreacionCitaComponent {
 
   //formulario para las horas de apertura y cierre jornada completa
   formularioHorasJornadaCompleta!: FormGroup;
-  //emiter
-  @Output() enviarCitasOut = new EventEmitter<Cita[]>();
+  //lista citas
   citas: Cita[] = [];
-
+  //controlador acordeones apertura/cierre
+  panelEstado= signal(false);
   constructor(
     private formBuilder: FormBuilder,
     private dialogo:MatDialog,
@@ -136,12 +138,14 @@ export class FormularioCreacionCitaComponent {
       // Actualizar el estado del formulario completo
       this.segundoFormulario.updateValueAndValidity();
     });
+   // this.citas=this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value);
   }
   procesarFormularios(){
     //si el primer formulario es valido, se procesa el segundo formulario
     if(this.primerFormulario.valid && this.segundoFormulario.valid){
       //console.log(this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value));
-      this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value).forEach(cita => {
+      //this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value).forEach(cita => {
+      this.citas.forEach(cita => {
         let citaCreada = {
           id: cita.fecha_cita,
           fecha_cita: cita.fecha_cita,
@@ -258,7 +262,7 @@ export class FormularioCreacionCitaComponent {
   }
   //crear metodo para valdiar formularios y si no valida que no se pueda pasar el step 3 ni 4
   calcularCitas(primerFormulario: any, segundoFormulario: any): Cita[] {
-    //let citas: Cita[] = [];
+    let citas: Cita[] = [];
 
     let fechaInicio = new Date(primerFormulario.fechaInicio);
     let fechaFin = new Date(primerFormulario.fechaFin);
@@ -282,7 +286,7 @@ export class FormularioCreacionCitaComponent {
         .map((d: string) => diasSemanaMap[d.trim()])
         .filter((d: number) => !isNaN(d) && d >= 0 && d <= 6);  // Validamos que el día esté en el rango [0-6]
     } else {
-      console.error('El formato de días libres no es válido.');
+      //console.error('El formato de días libres no es válido.');
     }
     let duracionCitaMin = this.conversionDuracionCita(segundoFormulario.duracionCita);
     let tipoJornada = segundoFormulario.tipoJornada;
@@ -319,7 +323,7 @@ export class FormularioCreacionCitaComponent {
         ) {
           const cita = new Cita();
           cita.fecha_cita = this.formatearFechaLocalISO(horaCita);
-          this.citas.push(cita);
+          citas.push(cita);
         }
       }
 
@@ -347,22 +351,25 @@ export class FormularioCreacionCitaComponent {
           ) {
             let cita = new Cita();
             cita.fecha_cita = this.formatearFechaLocalISO(horaCita);
-            this.citas.push(cita);
+            citas.push(cita);
           }
         }
       }
     }
-    return this.citas;
+    return citas;
   }
   formatearFechaLocalISO(date: Date): string {
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
   }
-
-  enviarCitas(){
-    // Aquí calculamos las citas usando los valores de los formularios
-    this.citas = this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value);
-    this.enviarCitasOut.emit(this.citas);
+//metodo para detectar el cambio de step
+  onStepChange(event: any) {
+    console.log('Step cambiado a:', event.selectedIndex);
+    if (event.selectedIndex === 2) {
+      //this.citas=[];
+      this.citas = this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value);
+      console.log('Citas generadas:', this.citas);
+    }
   }
-}
 
+}
