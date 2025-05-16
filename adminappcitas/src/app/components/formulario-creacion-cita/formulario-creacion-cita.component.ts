@@ -153,10 +153,11 @@ export class FormularioCreacionCitaComponent {
           usuario_id: 0,
           estado: "disponible"
         }
-        console.log(citaCreada);
+        this.dbCitas.createCita(citaCreada)
+
       });
       //this.dbCitas.createCita(this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value))
-      alert("Formulario enviado correctamente")
+      alert("Citas creadas correctamente")
     }else{
       this.dialogo.open(DialogErrorValdiacionComponent)
     }
@@ -364,11 +365,11 @@ export class FormularioCreacionCitaComponent {
   }
 //metodo para detectar el cambio de step
   onStepChange(event: any) {
-    console.log('Step cambiado a:', event.selectedIndex);
+    //console.log('Step cambiado a:', event.selectedIndex);
     if (event.selectedIndex === 2) {
       //this.citas=[];
       this.citas = this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value);
-      console.log('Citas generadas:', this.citas);
+      //console.log('Citas generadas:', this.citas);
     }
   }
 

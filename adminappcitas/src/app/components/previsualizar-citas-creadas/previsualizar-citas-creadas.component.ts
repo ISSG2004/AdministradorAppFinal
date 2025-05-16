@@ -32,7 +32,7 @@ export class PrevisualizarCitasCreadasComponent implements OnChanges {
     if (changes['citas'] && this.citas && this.citas.length > 0) {
       this.citasAgrupadas = this.agruparCitasPorDia(this.citas);
       this.fechas = Object.keys(this.citasAgrupadas).sort();
-      console.log('Citas agrupadas:', this.citasAgrupadas);
+      //console.log('Citas agrupadas:', this.citasAgrupadas);
     } else {
       this.citasAgrupadas = {};
       this.fechas = [];
@@ -54,7 +54,7 @@ export class PrevisualizarCitasCreadasComponent implements OnChanges {
     return citas.reduce((acc: { [key: string]: Cita[] }, cita) => {
       const fechaCita = new Date(cita.fecha_cita);
       if (isNaN(fechaCita.getTime())) {
-        console.warn(`Fecha inválida: ${cita.fecha_cita}`);
+        //console.warn(`Fecha inválida: ${cita.fecha_cita}`);
         return acc;
       }
       const fecha = `${fechaCita.getFullYear()}-${(fechaCita.getMonth() + 1).toString().padStart(2, '0')}-${fechaCita.getDate().toString().padStart(2, '0')}`;

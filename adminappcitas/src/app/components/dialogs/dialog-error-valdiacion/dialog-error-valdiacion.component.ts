@@ -1,13 +1,16 @@
 import { Component, Inject, InjectionToken } from '@angular/core';
 import { MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {MatButtonModule} from '@angular/material/button';
 @Component({
   selector: 'app-dialog-error-valdiacion',
   imports: [
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,],
+    MatDialogClose,
+    MatButtonModule
+  ],
   templateUrl: './dialog-error-valdiacion.component.html',
   styleUrl: './dialog-error-valdiacion.component.css'
 })
