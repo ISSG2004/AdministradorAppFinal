@@ -3,6 +3,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { Cita } from '../../models/Cita';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import {MatButtonModule} from '@angular/material/button';
 
 @Component({
   selector: 'app-previsualizar-citas-creadas',
@@ -10,6 +11,7 @@ import { CommonModule } from '@angular/common';
     MatExpansionModule,
     CommonModule,
     MatCardModule,
+    MatButtonModule
   ],
   standalone: true,
   templateUrl: './previsualizar-citas-creadas.component.html',
@@ -55,7 +57,8 @@ export class PrevisualizarCitasCreadasComponent implements OnChanges {
         console.warn(`Fecha inválida: ${cita.fecha_cita}`);
         return acc;
       }
-      const fecha = fechaCita.toISOString().split('T')[0];
+      const fecha = `${fechaCita.getFullYear()}-${(fechaCita.getMonth() + 1).toString().padStart(2, '0')}-${fechaCita.getDate().toString().padStart(2, '0')}`;
+
       if (!acc[fecha]) {
         acc[fecha] = [];
       }

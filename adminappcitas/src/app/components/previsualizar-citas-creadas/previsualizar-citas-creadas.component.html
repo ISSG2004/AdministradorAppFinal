@@ -3,17 +3,16 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          {{ fecha }}
+          {{ fecha | date:'dd-MM-yyyy'}}
         </mat-panel-title>
       </mat-expansion-panel-header>
 
       <mat-card *ngFor="let cita of citasAgrupadas[fecha]" style="margin-bottom: 8px;">
         <mat-card-content>
-          <!-- Aquí puedes mostrar más detalles de la cita si quieres -->
           Hora: {{ cita.fecha_cita | date:'shortTime' }} <br>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button color="warn" (click)="eliminarCita(cita)">Eliminar</button>
+          <button mat-button (click)="eliminarCita(cita)">Eliminar </button>
         </mat-card-actions>
       </mat-card>
     </mat-expansion-panel>
