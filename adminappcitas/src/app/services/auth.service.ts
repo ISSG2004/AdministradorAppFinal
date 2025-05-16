@@ -19,7 +19,7 @@ export class AuthService {
       let userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       if (userCredential.user) {
         this.router.navigate(['/home']);
-        console.log("Inicio de sesión exitoso");
+        //console.log("Inicio de sesión exitoso");
       } else {
         console.log("No se ha podido iniciar sesión");
       }
@@ -28,13 +28,13 @@ export class AuthService {
     }
   }
 
-  async register(email: string, password: string, nombre: string, telefono: string) {
+  async register(email: string, password: string) {
     await createUserWithEmailAndPassword(this.auth, email, password);
   }
 
-  logout() {
+  async logout() {
+    await signOut(this.auth);
     this.router.navigate(['/login']);
-    return signOut(this.auth);
   }
 
   getCurrentUser(): User | null {

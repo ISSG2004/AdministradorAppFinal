@@ -1,0 +1,15 @@
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 220px;
+}
+
+.contenido {
+  padding: 20px;
+}
+
+mat-nav-list > a {
+  padding: 15px;
+}

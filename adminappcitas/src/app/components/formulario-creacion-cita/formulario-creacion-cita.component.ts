@@ -147,16 +147,19 @@ export class FormularioCreacionCitaComponent {
       //this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value).forEach(cita => {
       this.citas.forEach(cita => {
         let citaCreada = {
-          id: cita.fecha_cita,
+          id: cita.fecha_cita+this.auth.getCurrentUser()?.uid,
           fecha_cita: cita.fecha_cita,
           negocio_id: this.auth.getCurrentUser()?.uid,
           usuario_id: 0,
           estado: "disponible"
         }
-        this.dbCitas.createCita(citaCreada)
+        this.dbCitas.getCita(citaCreada.id).subscribe((citaExistente) => {
+          if (!citaExistente) {
 
+            this.dbCitas.createCita(citaCreada);
+          }
+        });
       });
-      //this.dbCitas.createCita(this.calcularCitas(this.primerFormulario.value, this.segundoFormulario.value))
       alert("Citas creadas correctamente")
     }else{
       this.dialogo.open(DialogErrorValdiacionComponent)

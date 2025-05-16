@@ -70,7 +70,7 @@ toggleForm(mostrarLogin: boolean): void {
   async validarRegistro(): Promise<void> {
     if (this.formularioRegistro.valid) {
       let { nombre, email, password, telefono } = this.formularioRegistro.getRawValue();
-      await this.auth.register(email, password, nombre, telefono);
+      await this.auth.register(email, password);
       let negocio = {
         id: this.auth.getCurrentUser()?.uid,
         nombre: nombre,
