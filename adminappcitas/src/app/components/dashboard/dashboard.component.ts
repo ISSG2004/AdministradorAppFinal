@@ -6,24 +6,45 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
+import { RouterModule } from '@angular/router';
+import { DbcitasService } from '../../services/dbcitas.service';
+import { DBNegocioService } from '../../services/dbnegocio.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   providers: [
-    AuthService
+    AuthService,
+    DBNegocioService
   ],
   imports: [
-    FormularioCreacionCitaComponent,
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    RouterModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
-constructor(public auth: AuthService) {}
+  nombreNegocio: string = "Nombre del negocio";
+  constructor(public auth: AuthService,private dbNegocio: DBNegocioService) {
+  }
+  ngOnInit() {
+    this.obtenerNombreNegocio();
+  }
+  obtenerNombreNegocio() {
+    let currentUser = this.auth.getCurrentUser();
+      if (currentUser) {
+        this.dbNegocio.getNegocio(currentUser.uid).subscribe((negocio) => {
+          if (negocio && negocio.nombre) {
+            this.nombreNegocio = negocio.nombre;
+          } else {
+            this.nombreNegocio = 'Negocio no encontrado';
+          }
+        });
+      }
+    }
 }

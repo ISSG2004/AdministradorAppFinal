@@ -155,7 +155,6 @@ export class FormularioCreacionCitaComponent {
         }
         this.dbCitas.getCita(citaCreada.id).subscribe((citaExistente) => {
           if (!citaExistente) {
-
             this.dbCitas.createCita(citaCreada);
           }
         });
