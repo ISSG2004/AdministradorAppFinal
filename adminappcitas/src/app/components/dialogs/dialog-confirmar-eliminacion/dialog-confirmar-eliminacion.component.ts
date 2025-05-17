@@ -9,6 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   imports: [
     MatButtonModule
   ],
+  styleUrls: ['./dialog-confirmar-eliminacion.component.css']
 })
 export class DialogConfirmarEliminacionComponent {
   constructor(

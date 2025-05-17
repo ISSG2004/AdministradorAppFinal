@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+mat-dialog-content {
+  margin-bottom: 16px;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+button {
+  min-width: 80px;
+}

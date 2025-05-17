@@ -1,11 +1,13 @@
 <h1 mat-dialog-title>Editar Estado</h1>
-    <div mat-dialog-content>
-      <mat-form-field appearance="fill" style="width: 100%;">
-        <mat-label>Nuevo Estado</mat-label>
-        <input matInput [(ngModel)]="data.estado" />
-      </mat-form-field>
-    </div>
-    <div mat-dialog-actions>
-      <button mat-button (click)="onCancel()">Cancelar</button>
-      <button mat-button color="primary" [disabled]="!data.estado.trim()" (click)="onSave()">Guardar</button>
-    </div>
+<div mat-dialog-content>
+  <mat-form-field appearance="fill" style="width: 100%;">
+    <mat-label>Nuevo Estado</mat-label>
+    <mat-select [(ngModel)]="selectedEstado" required>
+      <mat-option *ngFor="let estado of estados" [value]="estado">{{ estado | titlecase }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-button color="primary" [disabled]="!selectedEstado" (click)="onSave()">Guardar</button>
+</div>
