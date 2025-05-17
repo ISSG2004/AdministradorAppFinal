@@ -1,0 +1,8 @@
+<h1 mat-dialog-title>Confirmar Eliminación</h1>
+    <div mat-dialog-content>
+      ¿Seguro que quieres eliminar la cita del {{ data.fecha_cita }}?
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="onCancel()">Cancelar</button>
+      <button mat-button color="warn" (click)="onConfirm()">Eliminar</button>
+    </div>

@@ -40,14 +40,14 @@ export class DashboardComponent {
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
   constructor(public auth: AuthService,private dbNegocio: DBNegocioService, private breakpointObserver: BreakpointObserver,) {
-    this.breakpointObserver.observe(['(max-width: 600px)']).subscribe(result => {
+    this.breakpointObserver.observe(['(max-width: 760px)']).subscribe(result => {
       this.mq600 = result.matches;
     });
   }
   ngOnInit() {
     this.obtenerNombreNegocio();
     this.breakpointObserver
-      .observe(['(max-width: 600px)'])
+      .observe(['(max-width: 760px)'])
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         this.mq600 = result.matches;

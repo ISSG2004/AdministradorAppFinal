@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database, DatabaseReference, DataSnapshot, get, getDatabase, onValue, ref, set } from '@angular/fire/database';
+import { Database, DatabaseReference, DataSnapshot, get, getDatabase, onValue, ref, remove, set, update } from '@angular/fire/database';
 import { FirebaseService } from './firebase.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Cita } from '../models/Cita';
@@ -69,6 +69,22 @@ export class DbcitasService {
       // Cleanup function cuando se cancela el observable
       return () => unsubscribe();
     });
+  }
+  async updateCita(cita: Cita): Promise<void> {
+    const citaRef = ref(this.db, `${this.path}/${cita.id}`);
+    // Actualiza solo los campos que quieras modificar
+    await update(citaRef, {
+      fecha_cita: cita.fecha_cita,
+      estado: cita.estado,
+      usuario_id: cita.usuario_id,
+      negocio_id: cita.negocio_id
+    });
+  }
+
+  // Método para eliminar una cita
+  async deleteCita(citaID: string): Promise<void> {
+    const citaRef = ref(this.db, `${this.path}/${citaID}`);
+    await remove(citaRef);
   }
 
 }

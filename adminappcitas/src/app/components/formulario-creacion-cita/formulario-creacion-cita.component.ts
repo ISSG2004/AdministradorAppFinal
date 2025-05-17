@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output, signal, ViewChild } from '@angular/core';
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, Form, FormGroup, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatStepperModule} from '@angular/material/stepper';
+import {MatStepper, MatStepperModule} from '@angular/material/stepper';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatButtonModule} from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -73,6 +73,8 @@ export class FormularioCreacionCitaComponent {
   citas: Cita[] = [];
   //controlador acordeones apertura/cierre
   panelEstado= signal(false);
+  //acceder al steper
+  @ViewChild('stepper') stepper!: MatStepper;
   constructor(
     private formBuilder: FormBuilder,
     private dialogo:MatDialog,
@@ -160,6 +162,10 @@ export class FormularioCreacionCitaComponent {
         });
       });
       alert("Citas creadas correctamente")
+      this.primerFormulario.reset();
+      this.segundoFormulario.reset();
+      this.stepper.selectedIndex = 0;
+      this.citas = [];
     }else{
       this.dialogo.open(DialogErrorValdiacionComponent)
     }
