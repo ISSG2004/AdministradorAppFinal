@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Database, DatabaseReference, DataSnapshot, get, getDatabase, onValue, ref, set } from '@angular/fire/database';
 import { FirebaseService } from './firebase.service';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Cita } from '../models/Cita';
 
 @Injectable({
   providedIn: 'root'
@@ -40,35 +41,34 @@ export class DbcitasService {
     });
   }
 
-  getCitas(userUID:any): Observable<any[]> {//buscar como añadir que solo busque las citas que solo coinciden con el id de usuario(uid)
-    // Creamos una referencia al nodo que utilizamos
-    let citaRef = ref(this.db, this.path);
-    // Devolvemos un Observable que envia los datos en tiempo real
+  getCitas(userUID: string): Observable<Cita[]> {
+    const citaRef = ref(this.db, this.path);
     return new Observable((observer) => {
-      // Obtenemos los datos en tiempo real con onValue
-      onValue(
+      const unsubscribe = onValue(
         citaRef,
         (snapshot) => {
-          let citas: any[] = [];
-          // Recorremos cada hijo del snapshot para construir la lista de negocios.
-          snapshot.forEach((childSnapshot: DataSnapshot) => {
-              // Obtenemos los datos del negocio
-              let cita = childSnapshot.val();
-              //validamos que el id del negocio coincida con el id del usuario
-              if (cita.usuario_id === userUID) {
-                // Agregamos el ID como una propiedad del objeto
-                cita.id = childSnapshot.key;
-                citas.push(cita);
-              }
-            });
-          // eviamos la lista actualizada mediante un subscribe
+          const citas: Cita[] = [];
+          snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            if (data.negocio_id === userUID) {
+              const cita: Cita = {
+                id: childSnapshot.key ?? '',
+                fecha_cita: data.fecha_cita ?? '',
+                estado: data.estado ?? 'disponible',
+                usuario_id: data.usuario_id ?? '',
+                negocio_id: data.negocio_id ?? '',
+              };
+              citas.push(cita);
+            }
+          });
           observer.next(citas);
         },
-        (error) => {
-          console.error("Error al obtener los negocios:", error);
-          observer.error(error);
-        }
+        (error) => observer.error(error)
       );
+
+      // Cleanup function cuando se cancela el observable
+      return () => unsubscribe();
     });
   }
+
 }

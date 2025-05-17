@@ -13,3 +13,9 @@
 mat-nav-list > a {
   padding: 15px;
 }
+
+mat-icon #btnNav {
+  cursor: pointer;
+  font-size: 32px;
+  margin: 8px;
+}

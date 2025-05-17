@@ -1,1 +1,38 @@
-<p>citas-negocio works!</p>
+<table mat-table [dataSource]="citas" class="mat-elevation-z8" >
+
+  <!-- ID Column -->
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef> ID </th>
+    <td mat-cell *matCellDef="let cita"> {{ cita.id }} </td>
+  </ng-container>
+
+  <!-- Fecha Cita Column -->
+  <ng-container matColumnDef="fecha_cita">
+    <th mat-header-cell *matHeaderCellDef> Fecha de Cita </th>
+    <td mat-cell *matCellDef="let cita"> {{ cita.fecha_cita }} </td>
+  </ng-container>
+
+  <!-- Estado Column -->
+  <ng-container matColumnDef="estado">
+    <th mat-header-cell *matHeaderCellDef> Estado </th>
+    <td mat-cell *matCellDef="let cita"> {{ cita.estado }} </td>
+  </ng-container>
+
+  <!-- Usuario ID Column -->
+  <ng-container matColumnDef="usuario_id">
+    <th mat-header-cell *matHeaderCellDef> Usuario </th>
+    <td mat-cell *matCellDef="let cita"> {{ cita.usuario_id || 'N/A' }} </td>
+  </ng-container>
+
+  <!-- Negocio ID Column -->
+  <ng-container matColumnDef="negocio_id">
+    <th mat-header-cell *matHeaderCellDef> Negocio </th>
+    <td mat-cell *matCellDef="let cita"> {{ cita.negocio_id }} </td>
+  </ng-container>
+
+  <!-- Header and Row Declarations -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+</table>
+

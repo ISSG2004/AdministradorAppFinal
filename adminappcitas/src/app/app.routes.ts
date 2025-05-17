@@ -5,6 +5,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { LoginNegociosComponent } from './components/login-negocios/login-negocios.component';
 import { AuthGuard } from './Guards/auth.guard';
 import { FormularioCreacionCitaComponent } from './components/formulario-creacion-cita/formulario-creacion-cita.component';
+import { CitasNegocioComponent } from './components/citas-negocio/citas-negocio.component';
 
 export const routes: Routes = [
   {
@@ -18,14 +19,20 @@ export const routes: Routes = [
     canActivate: [NoAuthGuard]
   },
   {
-    path: 'home',
-    component: DashboardComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'crearCitas',
-    component: FormularioCreacionCitaComponent,
-    canActivate: [AuthGuard]
+    path: '',
+    component: DashboardComponent, // Componente que contiene el Sidenav
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'home',
+        component: CitasNegocioComponent
+      },
+      {
+        path: 'crearCitas',
+        component: FormularioCreacionCitaComponent
+      }
+    ]
   }
 ];
+
 
