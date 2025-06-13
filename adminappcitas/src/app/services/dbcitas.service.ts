@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database, DatabaseReference, DataSnapshot, get, getDatabase, onValue, ref, remove, set, update } from '@angular/fire/database';
+import { Database, DatabaseReference, DataSnapshot, get, getDatabase, onValue, ref, remove, set, update, query, orderByChild, equalTo } from '@angular/fire/database';
 import { FirebaseService } from './firebase.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Cita } from '../models/Cita';
@@ -42,34 +42,36 @@ export class DbcitasService {
   }
 
   getCitas(userUID: string): Observable<Cita[]> {
-    const citaRef = ref(this.db, this.path);
-    return new Observable((observer) => {
-      const unsubscribe = onValue(
-        citaRef,
-        (snapshot) => {
-          const citas: Cita[] = [];
-          snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
-            if (data.negocio_id === userUID) {
-              const cita: Cita = {
-                id: childSnapshot.key ?? '',
-                fecha_cita: data.fecha_cita ?? '',
-                estado: data.estado ?? 'disponible',
-                usuario_id: data.usuario_id ?? '',
-                negocio_id: data.negocio_id ?? '',
-              };
-              citas.push(cita);
-            }
-          });
-          observer.next(citas);
-        },
-        (error) => observer.error(error)
-      );
+  const citasQuery = query(
+    ref(this.db, this.path),
+    orderByChild('negocio_id'),
+    equalTo(userUID)
+  );
 
-      // Cleanup function cuando se cancela el observable
-      return () => unsubscribe();
-    });
-  }
+  return new Observable((observer) => {
+    const unsubscribe = onValue(
+      citasQuery,
+      (snapshot) => {
+        const citas: Cita[] = [];
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          const cita: Cita = {
+            id: childSnapshot.key ?? '',
+            fecha_cita: data.fecha_cita ?? '',
+            estado: data.estado ?? 'disponible',
+            usuario_id: data.usuario_id ?? '',
+            negocio_id: data.negocio_id ?? '',
+          };
+          citas.push(cita);
+        });
+        observer.next(citas);
+      },
+      (error) => observer.error(error)
+    );
+
+    return () => unsubscribe();
+  });
+}
   async updateCita(cita: Cita): Promise<void> {
     const citaRef = ref(this.db, `${this.path}/${cita.id}`);
     // Actualiza solo los campos que quieras modificar

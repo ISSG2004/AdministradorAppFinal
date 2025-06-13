@@ -26,6 +26,7 @@ import { DialogConfirmarEliminacionComponent } from '../dialogs/dialog-confirmar
 export class CitasNegocioComponent {
   displayedColumns: string[] = ['fecha_cita', 'usuario_id', 'estado', 'acciones'];
   citas: Cita[] = [];
+  user :any;
 
   constructor(
     private dbCitas: DbcitasService,
@@ -34,13 +35,14 @@ export class CitasNegocioComponent {
   ) {}
 
   ngOnInit() {
+    this.user = this.auth.getCurrentUser();
     this.cargarCitas();
   }
 
   cargarCitas() {
-    let user = this.auth.getCurrentUser();
-    if (user?.uid) {
-      this.dbCitas.getCitas(user.uid).subscribe((data: Cita[]) => {
+
+    if (this.user?.uid) {
+      this.dbCitas.getCitas(this.user.uid).subscribe((data: Cita[]) => {
         this.citas = data;
       });
     }
