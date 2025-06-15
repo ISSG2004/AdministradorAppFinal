@@ -63,6 +63,10 @@ AdministradorAppFinal/
 
 Esta app utiliza Firebase. Asegúrate de configurar tu proyecto y agregar los datos en los archivos `environment.ts` correspondientes.
 
+## 🌐 Link de app desplegada
+
+https://appoadmin-issg2004s-projects.vercel.app/login
+
 ## 📄 Licencia
 
 Este proyecto está licenciado bajo la [MIT License](LICENSE).
