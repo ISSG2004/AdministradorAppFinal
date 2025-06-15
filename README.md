@@ -8,7 +8,6 @@ AdministradorAppFinal es una aplicación web desarrollada con Angular para la ge
 - Angular Material
 - Firebase
 - Bootstrap 5
-- Express (SSR)
 
 ## 🚀 Instalación
 
