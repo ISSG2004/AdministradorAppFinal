@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/adminappcitas/**",
+      "src": "dist/adminappcitas/browser/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.csr.html"
+      "dest": "/index.html"
     }
   ]
 }
